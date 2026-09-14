@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Questionnaire</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Apply saved theme before first paint to avoid a flash.
+  try { var t = localStorage.getItem('pq.theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#setup">Project Questionnaire</a>
+  <nav class="topnav" aria-label="Sections">
+    <a href="#setup" data-nav="setup">Setup</a>
+    <a href="#step/1" data-nav="step">Questions</a>
+    <a href="#review" data-nav="review">Review</a>
+    <a href="#builder" data-nav="builder">Builder</a>
+  </nav>
+  <a class="util-link" href="https://w3bninja.github.io/ux-matter/#process" title="Back to the UX Field Guide">UX Field Guide ↗</a>
+  <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">
+    <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</header>
+
+<main class="shell">
+
+  <!-- ============ SETUP ============ -->
+  <section class="view" id="view-setup">
+    <p class="eyebrow">Step 0</p>
+    <h1 class="display">What kind of project is this?</h1>
+    <p class="lede">Pick every project type that applies. Questions are tagged, so a website + branding project pulls both sets and skips the rest.</p>
+
+    <div class="card">
+      <h2>Project type</h2>
+      <div class="chips" id="groupChips"></div>
+      <p class="hint" id="groupHint"></p>
+    </div>
+
+    <div class="card-row">
+      <div class="card">
+        <h2>Stage</h2>
+        <div class="radios" id="stageRadios"></div>
+        <p class="hint">Pre-sales questions scope the proposal; post-sales questions run at kickoff.</p>
+      </div>
+      <div class="card">
+        <h2>Audience</h2>
+        <div class="radios" id="typeRadios"></div>
+        <p class="hint">Some questions only make sense for internal tools or public-facing products. Untagged questions always show.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <span class="count" id="setupCount"></span>
+      <button class="btn primary" id="startBtn" type="button">Start questionnaire →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP ============ -->
+  <section class="view" id="view-step">
+    <div class="stepper" id="stepper"></div>
+    <p class="eyebrow" id="stepEyebrow"></p>
+    <h1 class="display" id="stepTitle"></h1>
+    <div id="stepQuestions"></div>
+    <div class="actions split">
+      <button class="btn" id="prevBtn" type="button">← Back</button>
+      <button class="btn primary" id="nextBtn" type="button">Next →</button>
+    </div>
+  </section>
+
+  <!-- ============ REVIEW ============ -->
+  <section class="view" id="view-review">
+    <p class="eyebrow">Review</p>
+    <h1 class="display">Your questionnaire</h1>
+    <p class="lede" id="reviewSummary"></p>
+    <div class="toolbar">
+      <button class="btn" id="copyBlankBtn" type="button">Copy blank (Markdown)</button>
+      <button class="btn" id="copyFilledBtn" type="button">Copy with answers (Markdown)</button>
+      <button class="btn" id="downloadJsonBtn" type="button">Download JSON</button>
+      <button class="btn" id="printBtn" type="button">Print / PDF</button>
+      <span class="spacer"></span>
+      <button class="btn danger" id="clearAnswersBtn" type="button">Clear answers</button>
+    </div>
+    <div id="reviewBody" class="review"></div>
+  </section>
+
+  <!-- ============ BUILDER ============ -->
+  <section class="view" id="view-builder">
+    <p class="eyebrow">Builder</p>
+    <h1 class="display">Question bank</h1>
+    <p class="lede">Add, edit, tag, and reorder questions. Changes are saved in this browser and override the seed list. Export to share or back up.</p>
+    <div class="toolbar">
+      <button class="btn primary" id="addQuestionBtn" type="button">+ Add question</button>
+      <button class="btn" id="exportBankBtn" type="button">Export bank (JSON)</button>
+      <label class="btn">Import bank (JSON)<input type="file" id="importBankInput" accept="application/json" hidden></label>
+      <span class="spacer"></span>
+      <span class="count" id="bankCount"></span>
+      <button class="btn danger" id="resetBankBtn" type="button">Reset to seed</button>
+    </div>
+    <div class="toolbar filters">
+      <input type="search" id="bankSearch" placeholder="Filter questions…" aria-label="Filter questions">
+      <select id="bankCategory" aria-label="Filter by category"><option value="">All categories</option></select>
+      <select id="bankGroup" aria-label="Filter by project type"><option value="">All project types</option></select>
+    </div>
+    <div id="bankList" class="bank"></div>
+  </section>
+
+</main>
+
+<template id="questionTpl">
+  <div class="q">
+    <label class="q-text"></label>
+    <div class="tags"></div>
+    <textarea rows="3" placeholder="Answer…"></textarea>
+  </div>
+</template>
+
+<template id="bankRowTpl">
+  <details class="bank-row">
+    <summary>
+      <span class="bank-cat"></span>
+      <span class="bank-text"></span>
+      <span class="bank-groups"></span>
+    </summary>
+    <div class="bank-edit">
+      <label>Question<textarea data-f="text" rows="2"></textarea></label>
+      <label>Category<input data-f="category" list="categoryList"></label>
+      <fieldset><legend>Project types</legend><div class="checks" data-f="groups"></div></fieldset>
+      <fieldset><legend>Audience</legend><div class="checks" data-f="types"></div></fieldset>
+      <fieldset><legend>Stage</legend><div class="checks" data-f="stages"></div></fieldset>
+      <div class="bank-actions">
+        <button class="btn sm" data-act="up" type="button">↑ Move up</button>
+        <button class="btn sm" data-act="down" type="button">↓ Move down</button>
+        <span class="spacer"></span>
+        <button class="btn sm danger" data-act="delete" type="button">Delete</button>
+      </div>
+    </div>
+  </details>
+</template>
+<datalist id="categoryList"></datalist>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
